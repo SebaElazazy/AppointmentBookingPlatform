@@ -3,6 +3,7 @@ using AppointmentsManagementSystem.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 namespace AppointmentsManagementSystem
 {
     public class Program
