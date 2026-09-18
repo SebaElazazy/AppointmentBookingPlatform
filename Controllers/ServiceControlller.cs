@@ -1,8 +1,7 @@
 ﻿using AppointmentsManagementSystem.Data;
-using AppointmentsManagementSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using AppointmentsManagementSystem.Models;
 namespace AppointmentsManagementSystem.Controllers
 {
     public class ServicesController : Controller

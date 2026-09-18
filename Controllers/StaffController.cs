@@ -1,9 +1,8 @@
 ﻿using AppointmentsManagementSystem.Data;
-using AppointmentsManagementSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
+using AppointmentsManagementSystem.Models;
 namespace AppointmentsManagementSystem.Controllers
 {
     public class StaffController : Controller
