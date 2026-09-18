@@ -1,5 +1,6 @@
 ﻿using AppointmentsManagementSystem.Data;
 using AppointmentsManagementSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Appointment
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var appointments = await _context.Appointments
@@ -27,6 +29,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Appointment/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -43,6 +46,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Appointment/Create
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["CustomerId"] = new SelectList(_context.Users, "Id", "FullName");
@@ -54,6 +58,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Appointment/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create([Bind("CustomerId,StaffId,ServiceId,AppointmentDate,StartTime,EndTime")] Appointment appointment)
         {
             // منع التعارض (Overlap Check)
@@ -84,6 +89,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Appointment/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -100,6 +106,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Appointment/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,StaffId,ServiceId,AppointmentDate,StartTime,EndTime,Status")] Appointment appointment)
         {
             if (id != appointment.Id) return NotFound();
@@ -140,6 +147,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Appointment/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -158,6 +166,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Appointment/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var appointment = await _context.Appointments.FindAsync(id);

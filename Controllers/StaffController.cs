@@ -1,8 +1,9 @@
 ﻿using AppointmentsManagementSystem.Data;
+using AppointmentsManagementSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using AppointmentsManagementSystem.Models;
 namespace AppointmentsManagementSystem.Controllers
 {
     public class StaffController : Controller
@@ -38,6 +39,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Staff/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "FullName");
@@ -48,6 +50,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Staff/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("UserId,Specialization,ImageUrl")] Staff staff, int[] selectedServices)
         {
             if (ModelState.IsValid)
@@ -76,6 +79,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Staff/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -93,8 +97,10 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // POST: Staff/Edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Specialization,ImageUrl")] Staff staff, int[] selectedServices)
         {
             if (id != staff.Id) return NotFound();
@@ -135,6 +141,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Staff/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -151,6 +158,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Staff/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var staff = await _context.Staff.FindAsync(id);

@@ -1,5 +1,6 @@
 ﻿using AppointmentsManagementSystem.Data;
 using AppointmentsManagementSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: AvailabilityException/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization");
@@ -50,6 +52,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: AvailabilityException/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("StaffId,Date,IsDayOff,StartTime,EndTime")] AvailabilityException exception)
         {
             if (ModelState.IsValid)
@@ -63,6 +66,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: AvailabilityException/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -77,6 +81,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: AvailabilityException/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StaffId,Date,IsDayOff,StartTime,EndTime")] AvailabilityException exception)
         {
             if (id != exception.Id) return NotFound();
@@ -100,6 +105,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: AvailabilityException/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -117,6 +123,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: AvailabilityException/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exception = await _context.AvailabilityExceptions.FindAsync(id);

@@ -1,5 +1,6 @@
 ﻿using AppointmentsManagementSystem.Data;
 using AppointmentsManagementSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: WorkingHour/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["StaffId"] = new SelectList(_context.Staff.Include(s => s.User), "Id", "Specialization");
@@ -50,6 +52,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: WorkingHour/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("StaffId,DayOfWeek,StartTime,EndTime")] WorkingHour workingHour)
         {
             if (ModelState.IsValid)
@@ -63,6 +66,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: WorkingHour/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -77,6 +81,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: WorkingHour/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StaffId,DayOfWeek,StartTime,EndTime")] WorkingHour workingHour)
         {
             if (id != workingHour.Id) return NotFound();
@@ -100,6 +105,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: WorkingHour/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -117,6 +123,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: WorkingHour/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var workingHour = await _context.WorkingHours.FindAsync(id);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AppointmentsManagementSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 namespace AppointmentsManagementSystem.Controllers
 {
     public class ServicesController : Controller
@@ -40,6 +41,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Services/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -48,6 +50,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Services/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Name,Description,Price,DurationMinutes,ImageUrl,IsActive")] Service service)
         {
             if (ModelState.IsValid)
@@ -60,6 +63,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Services/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,6 +82,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Services/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,DurationMinutes,ImageUrl,IsActive")] Service service)
         {
             if (id != service.Id)
@@ -109,6 +114,7 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // GET: Services/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,6 +136,7 @@ namespace AppointmentsManagementSystem.Controllers
         // POST: Services/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var service = await _context.Services.FindAsync(id);
