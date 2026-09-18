@@ -1,0 +1,217 @@
+﻿@using AppointmentsManagementSystem.Models
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+            body {
+                background-color: #eef1f5;
+                font-family: 'Segoe UI', sans-serif;
+            }
+            .sidebar {
+                background-color: #0b2447;
+                min-height: 100vh;
+                color: white;
+                padding-top: 20px;
+            }
+            .sidebar a {
+                color: #cfd8e3;
+                display: block;
+                padding: 12px 20px;
+                text-decoration: none;
+            }
+            .sidebar a:hover, .sidebar a.active {
+                background-color: #17417a;
+                color: white;
+            }
+            .topbar {
+                background: white;
+                padding: 15px 25px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            }
+            .welcome-banner {
+                background: linear-gradient(135deg, #f4a742, #f47c42);
+                border-radius: 12px;
+                color: white;
+                padding: 25px;
+            }
+            .quick-card {
+                background: white;
+                border-radius: 10px;
+                text-align: center;
+                padding: 20px 10px;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+                text-decoration: none;
+                color: #333;
+                display: block;
+                transition: 0.2s;
+            }
+            .quick-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+                color: #0b2447;
+            }
+            .quick-card i {
+                font-size: 28px;
+                color: #0b2447;
+                margin-bottom: 8px;
+            }
+            .stat-card {
+                background: white;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+                text-align: center;
+            }
+            .stat-number {
+                font-size: 28px;
+                font-weight: bold;
+                color: #0b2447;
+            }
+            .panel {
+                background: white;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar" style="width: 220px;">
+            <h5 class="text-center mb-4">Appointments</h5>
+            <a href="/Dashboard" class="active">Dashboard</a>
+            <a href="/Services">Services</a>
+            <a href="/Staff">Staff</a>
+            <a href="/WorkingHour">Working Hours</a>
+            <a href="/AvailabilityException">Exceptions</a>
+            <a href="/Appointment">Appointments</a>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-grow-1">
+            <div class="topbar d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Dashboard</h5>
+                <span>Admin</span>
+            </div>
+
+            <div class="p-4">
+                <!-- Welcome banner -->
+                <div class="welcome-banner mb-4">
+                    <h4>Welcome, Admin</h4>
+                    <p class="mb-0">Here's what's happening in your business today.</p>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="row mb-4">
+                    <div class="col">
+                        <a href="/Services/Create" class="quick-card">
+                            <i class="bi bi-plus-circle"></i>
+                            <div>Add Service</div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/Staff/Create" class="quick-card">
+                            <i class="bi bi-person-plus"></i>
+                            <div>Add Staff</div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/WorkingHour/Create" class="quick-card">
+                            <i class="bi bi-clock"></i>
+                            <div>Add Working Hours</div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/AvailabilityException/Create" class="quick-card">
+                            <i class="bi bi-calendar-x"></i>
+                            <div>Add Exception</div>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="/Appointment" class="quick-card">
+                            <i class="bi bi-calendar-check"></i>
+                            <div>View Bookings</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Recent appointments -->
+                    <div class="col-md-6 mb-4">
+                        <div class="panel">
+                            <h6 class="mb-3">Recent Appointments</h6>
+                            @foreach (var appt in (List<Appointment>)ViewBag.RecentAppointments)
+                            {
+                                <div class="d-flex justify-content-between border-bottom py-2">
+                                    <div>
+                                        <strong>@appt.Customer?.FullName</strong><br />
+                                        <small class="text-muted">@appt.Service?.Name with @appt.Staff?.User?.FullName</small>
+                                    </div>
+                                    <span class="badge bg-secondary align-self-center">@appt.Status</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="col-md-6 mb-4">
+                        <div class="panel">
+                            <h6 class="mb-3">Summary</h6>
+                            <div class="row text-center mb-4">
+                                <div class="col">
+                                    <div class="stat-number">@ViewBag.TotalCustomers</div>
+                                    <small>Total Users</small>
+                                </div>
+                                <div class="col">
+                                    <div class="stat-number">@ViewBag.TotalStaff</div>
+                                    <small>Total Staff</small>
+                                </div>
+                                <div class="col">
+                                    <div class="stat-number">@ViewBag.TotalServices</div>
+                                    <small>Total Services</small>
+                                </div>
+                            </div>
+                            <canvas id="bookingChart" style="max-height: 220px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+            const ctx = document.getElementById('bookingChart');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+                    datasets: [{
+                        data: [
+                            @ViewBag.PendingCount,
+                            @ViewBag.ConfirmedCount,
+                            @ViewBag.CompletedCount,
+                            @ViewBag.CancelledCount
+                        ],
+                        backgroundColor: ['#f4a742', '#3b82f6', '#22c55e', '#ef4444']
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+    </script>
+</body>
+</html>
