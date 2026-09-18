@@ -1,6 +1,7 @@
 ﻿using AppointmentsManagementSystem.Data;
 using AppointmentsManagementSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,21 +11,32 @@ namespace AppointmentsManagementSystem.Controllers
     public class AppointmentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AppointmentController(ApplicationDbContext context)
+        public AppointmentController(ApplicationDbContext context, UserManager <ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Appointment
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var appointments = await _context.Appointments
+            var query = _context.Appointments
                 .Include(a => a.Customer)
                 .Include(a => a.Staff).ThenInclude(s => s.User)
                 .Include(a => a.Service)
-                .ToListAsync();
+                .AsQueryable();
+
+            
+            if (!User.IsInRole("Admin"))
+            {
+                var userId = _userManager.GetUserId(User);
+                query = query.Where(a => a.CustomerId == userId);
+            }
+
+            var appointments = await query.ToListAsync();
             return View(appointments);
         }
 
@@ -79,9 +91,9 @@ namespace AppointmentsManagementSystem.Controllers
                 appointment.Status = AppointmentStatus.Pending;
                 _context.Add(appointment);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Your appointment has been booked successfully!";
                 return RedirectToAction(nameof(Index));
             }
-
             ViewData["CustomerId"] = new SelectList(_context.Users, "Id", "FullName", appointment.CustomerId);
             ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", appointment.StaffId);
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", appointment.ServiceId);
