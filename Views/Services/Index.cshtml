@@ -1,73 +1,88 @@
 @model IEnumerable<AppointmentsManagementSystem.Models.Service>
-
 @{
-    Layout = null;
+    ViewData["Title"] = "Services";
 }
 
-<!DOCTYPE html>
+<div class="page-header">
+    <div>
+        <h1>Services</h1>
+        <p>What your business offers, with pricing and duration.</p>
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="action-btn">+ Add service</a>
+    }
+</div>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DurationMinutes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DurationMinutes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@if (!Model.Any())
+{
+    <div class="admin-card">
+        <div class="empty-state">
+            <div class="icon-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.6H20l-4.6 3.4 1.8 5.6L12 14.2 6.8 17.6l1.8-5.6L4 8.6h6.2z" /></svg>
+            </div>
+            <h3>No services yet</h3>
+            <p>Add your first service so customers can start booking.</p>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="action-btn">+ Add service</a>
+            }
+        </div>
+    </div>
 }
-    </tbody>
-</table>
-</body>
-</html>
+else
+{
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="cell-primary">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" class="row-thumb" alt="@item.Name" />
+                                }
+                                else
+                                {
+                                    <div class="row-thumb-fallback">@item.Name.Substring(0, 1)</div>
+                                }
+                                <div class="t">
+                                    <strong>@item.Name</strong>
+                                    <small>@item.Description</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@item.Price.ToString("0") EGP</td>
+                        <td>@item.DurationMinutes min</td>
+                        <td>
+                            <span class="badge-status @(item.IsActive ? "status-active" : "status-inactive")">
+                                @(item.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-links">
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="danger">Delete</a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

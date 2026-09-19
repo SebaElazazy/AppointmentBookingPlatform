@@ -1,86 +1,73 @@
 @model IEnumerable<AppointmentsManagementSystem.Models.Appointment>
-
 @{
-    Layout = null;
+    ViewData["Title"] = "Appointments";
 }
-@if (TempData["SuccessMessage"] != null)
+
+<div class="page-header">
+    <div>
+        <h1>@(User.IsInRole("Admin") ? "Appointments" : "My appointments")</h1>
+        <p>@(User.IsInRole("Admin") ? "Every booking across the business." : "Everything you've booked, past and upcoming.")</p>
+    </div>
+    <a asp-action="Create" class="action-btn">+ Book appointment</a>
+</div>
+
+@if (!Model.Any())
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="admin-card">
+        <div class="empty-state">
+            <div class="icon-badge">
+                <svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="2" /><path d="M3.5 9.5h17M8 3v3M16 3v3" /></svg>
+            </div>
+            <h3>No appointments yet</h3>
+            <p>Book a service to see it show up here.</p>
+            <a asp-action="Create" class="action-btn">+ Book appointment</a>
+        </div>
     </div>
 }
-
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Staff)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Service)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AppointmentDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Customer.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Staff.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Service.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AppointmentDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+else
+{
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <th>Customer</th>
+                    }
+                    <th>Service</th>
+                    <th>Staff</th>
+                    <th>Date &amp; time</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderByDescending(a => a.AppointmentDate))
+                {
+                    <tr>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <td>@item.Customer?.FullName</td>
+                        }
+                        <td>@item.Service?.Name</td>
+                        <td>@item.Staff?.User?.FullName</td>
+                        <td>@item.AppointmentDate.ToString("MMM d, yyyy") &middot; @item.StartTime.ToString(@"hh\:mm")</td>
+                        <td>
+                            <span class="badge-status status-@item.Status.ToString().ToLower()">@item.Status</span>
+                        </td>
+                        <td>
+                            <div class="action-links">
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="danger">Cancel</a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
-    </tbody>
-</table>
-</body>
-</html>

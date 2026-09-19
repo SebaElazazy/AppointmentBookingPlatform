@@ -1,61 +1,72 @@
 @model IEnumerable<AppointmentsManagementSystem.Models.WorkingHour>
-
 @{
-    Layout = null;
+    ViewData["Title"] = "Working Hours";
 }
 
-<!DOCTYPE html>
+<div class="page-header">
+    <div>
+        <h1>Working hours</h1>
+        <p>The recurring weekly schedule for each staff member.</p>
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="action-btn">+ Add working hours</a>
+    }
+</div>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Staff)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DayOfWeek)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndTime)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Staff.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DayOfWeek)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@if (!Model.Any())
+{
+    <div class="admin-card">
+        <div class="empty-state">
+            <div class="icon-badge">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3.5 2" /></svg>
+            </div>
+            <h3>No working hours set</h3>
+            <p>Add a schedule so customers can see when staff are available.</p>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="action-btn">+ Add working hours</a>
+            }
+        </div>
+    </div>
 }
-    </tbody>
-</table>
-</body>
-</html>
+else
+{
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Staff</th>
+                    <th>Day</th>
+                    <th>Hours</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="cell-primary">
+                                <div class="avatar-chip">@(item.Staff?.User?.FullName?.Substring(0, 1) ?? "?")</div>
+                                <div class="t"><strong>@item.Staff?.User?.FullName</strong></div>
+                            </div>
+                        </td>
+                        <td>@item.DayOfWeek</td>
+                        <td>@item.StartTime.ToString(@"hh\:mm") &ndash; @item.EndTime.ToString(@"hh\:mm")</td>
+                        <td>
+                            <div class="action-links">
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="danger">Delete</a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

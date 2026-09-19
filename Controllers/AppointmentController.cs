@@ -73,7 +73,53 @@ namespace AppointmentsManagementSystem.Controllers
         [Authorize]
         public async Task<IActionResult> Create([Bind("CustomerId,StaffId,ServiceId,AppointmentDate,StartTime,EndTime")] Appointment appointment)
         {
-            // منع التعارض (Overlap Check)
+            var exception = await _context.AvailabilityExceptions
+                .FirstOrDefaultAsync(e => e.StaffId == appointment.StaffId
+                    && e.Date.Date == appointment.AppointmentDate.Date);
+
+            bool isDayOff = false;
+            TimeSpan? allowedStart = null;
+            TimeSpan? allowedEnd = null;
+
+            if (exception != null)
+            {
+                if (exception.IsDayOff)
+                {
+                    isDayOff = true;
+                }
+                else
+                {
+                    allowedStart = exception.StartTime;
+                    allowedEnd = exception.EndTime;
+                }
+            }
+            else
+            {
+                
+                var workingHour = await _context.WorkingHours
+                    .FirstOrDefaultAsync(w => w.StaffId == appointment.StaffId
+                        && w.DayOfWeek == appointment.AppointmentDate.DayOfWeek);
+
+                if (workingHour == null)
+                {
+                    isDayOff = true;
+                }
+                else
+                {
+                    allowedStart = workingHour.StartTime;
+                    allowedEnd = workingHour.EndTime;
+                }
+            }
+
+            if (isDayOff)
+            {
+                ModelState.AddModelError(string.Empty, "This staff member is not working on the selected day.");
+            }
+            else if (appointment.StartTime < allowedStart || appointment.EndTime > allowedEnd)
+            {
+                ModelState.AddModelError(string.Empty, $"This staff member is only available from {allowedStart:hh\\:mm} to {allowedEnd:hh\\:mm} on this day.");
+            }
+
             bool hasConflict = await _context.Appointments
                 .AnyAsync(a => a.StaffId == appointment.StaffId
                     && a.Status != AppointmentStatus.Cancelled
@@ -86,20 +132,19 @@ namespace AppointmentsManagementSystem.Controllers
                 ModelState.AddModelError(string.Empty, "This staff member already has an appointment during this time.");
             }
 
-            if (ModelState.IsValid && !hasConflict)
+            if (ModelState.IsValid)
             {
                 appointment.Status = AppointmentStatus.Pending;
                 _context.Add(appointment);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Your appointment has been booked successfully!";
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["CustomerId"] = new SelectList(_context.Users, "Id", "FullName", appointment.CustomerId);
             ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", appointment.StaffId);
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", appointment.ServiceId);
             return View(appointment);
         }
-
         // GET: Appointment/Edit/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
@@ -123,7 +168,7 @@ namespace AppointmentsManagementSystem.Controllers
         {
             if (id != appointment.Id) return NotFound();
 
-            // منع التعارض (مستثنية الـAppointment نفسه من المقارنة)
+           
             bool hasConflict = await _context.Appointments
                 .AnyAsync(a => a.Id != appointment.Id
                     && a.StaffId == appointment.StaffId
