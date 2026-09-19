@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 namespace AppointmentsManagementSystem.Controllers
 {
     public class StaffController : Controller
@@ -31,6 +32,7 @@ namespace AppointmentsManagementSystem.Controllers
 
             var staff = await _context.Staff
                 .Include(s => s.User)
+                .Include(s => s.StaffServices).ThenInclude(ss => ss.Service)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (staff == null) return NotFound();
@@ -43,7 +45,7 @@ namespace AppointmentsManagementSystem.Controllers
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "FullName");
-            ViewBag.Services=_context.Services.ToList();
+            ViewBag.Services = _context.Services.ToList();
             return View();
         }
 
@@ -51,12 +53,25 @@ namespace AppointmentsManagementSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("UserId,Specialization,ImageUrl")] Staff staff, int[] selectedServices)
+        public async Task<IActionResult> Create([Bind("UserId,Specialization")] Staff staff, IFormFile? ImageFile, int[] selectedServices)
         {
             if (ModelState.IsValid)
             {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
+                    var savePath = Path.Combine("wwwroot", "images", "staff", fileName);
+
+                    using (var stream = new FileStream(savePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+
+                    staff.ImageUrl = "/images/staff/" + fileName;
+                }
+
                 _context.Add(staff);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // لازم الأول عشان ياخد staff.Id
 
                 if (selectedServices != null)
                 {
@@ -73,6 +88,7 @@ namespace AppointmentsManagementSystem.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "FullName", staff.UserId);
             ViewBag.Services = _context.Services.ToList();
             return View(staff);
@@ -97,11 +113,10 @@ namespace AppointmentsManagementSystem.Controllers
         }
 
         // POST: Staff/Edit/5
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Specialization,ImageUrl")] Staff staff, int[] selectedServices)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Specialization")] Staff staff, IFormFile? ImageFile, int[] selectedServices)
         {
             if (id != staff.Id) return NotFound();
 
@@ -109,6 +124,24 @@ namespace AppointmentsManagementSystem.Controllers
             {
                 try
                 {
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
+                        var savePath = Path.Combine("wwwroot", "images", "staff", fileName);
+
+                        using (var stream = new FileStream(savePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(stream);
+                        }
+
+                        staff.ImageUrl = "/images/staff/" + fileName;
+                    }
+                    else
+                    {
+                        var existing = await _context.Staff.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                        staff.ImageUrl = existing?.ImageUrl;
+                    }
+
                     _context.Update(staff);
 
                     var existingLinks = _context.StaffServices.Where(ss => ss.StaffId == id);
@@ -135,6 +168,7 @@ namespace AppointmentsManagementSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "FullName", staff.UserId);
             ViewBag.Services = _context.Services.ToList();
             return View(staff);

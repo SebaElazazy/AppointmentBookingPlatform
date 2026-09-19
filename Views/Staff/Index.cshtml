@@ -1,55 +1,81 @@
 @model IEnumerable<AppointmentsManagementSystem.Models.Staff>
-
 @{
-    Layout = null;
+    ViewData["Title"] = "Staff";
 }
 
-<!DOCTYPE html>
+<div class="page-header">
+    <div>
+        <h1>Staff</h1>
+        <p>The people who provide your services.</p>
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="action-btn">+ Add staff</a>
+    }
+</div>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Specialization)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Specialization)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageUrl)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@if (!Model.Any())
+{
+    <div class="admin-card">
+        <div class="empty-state">
+            <div class="icon-badge">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4" /><path d="M5 20c1.2-4 4-5.6 7-5.6s5.8 1.6 7 5.6" /></svg>
+            </div>
+            <h3>No staff yet</h3>
+            <p>Add a staff member so customers can book with them.</p>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="action-btn">+ Add staff</a>
+            }
+        </div>
+    </div>
 }
-    </tbody>
-</table>
-</body>
-</html>
+else
+{
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Specialization</th>
+                    <th>Email</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="cell-primary">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" class="row-thumb" style="border-radius:50%;" alt="@item.User?.FullName" />
+                                }
+                                else
+                                {
+                                    <div class="avatar-chip">@(item.User?.FullName?.Substring(0, 1) ?? "?")</div>
+                                }
+                                <div class="t">
+                                    <strong>@item.User?.FullName</strong>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@item.Specialization</td>
+                        <td>@item.User?.Email</td>
+                        <td>
+                            <div class="action-links">
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="danger">Delete</a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
