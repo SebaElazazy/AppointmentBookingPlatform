@@ -116,6 +116,13 @@ public class LoginModel : PageModel
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
+
+                var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                if (user != null && await _signInManager.UserManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return RedirectToAction("Index", "Dashboard");
+                }
+
                 return LocalRedirect(returnUrl);
             }
             if (result.RequiresTwoFactor)

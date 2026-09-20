@@ -1,6 +1,7 @@
 ﻿using AppointmentsManagementSystem.Data;
 using AppointmentsManagementSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,12 @@ namespace AppointmentsManagementSystem.Controllers
     public class StaffController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public StaffController(ApplicationDbContext context)
+        public StaffController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Staff
@@ -72,6 +75,20 @@ namespace AppointmentsManagementSystem.Controllers
 
                 _context.Add(staff);
                 await _context.SaveChangesAsync(); // لازم الأول عشان ياخد staff.Id
+
+                // تحويل الحساب لـStaff: شيل Customer وحط Staff
+                var user = await _userManager.FindByIdAsync(staff.UserId);
+                if (user != null)
+                {
+                    if (await _userManager.IsInRoleAsync(user, "Customer"))
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, "Customer");
+                    }
+                    if (!await _userManager.IsInRoleAsync(user, "Staff"))
+                    {
+                        await _userManager.AddToRoleAsync(user, "Staff");
+                    }
+                }
 
                 if (selectedServices != null)
                 {
@@ -160,6 +177,20 @@ namespace AppointmentsManagementSystem.Controllers
                     }
 
                     await _context.SaveChangesAsync();
+
+                    // تأكيد إن الحساب لسه محتفظ بـRole "Staff" بعد التعديل
+                    var user = await _userManager.FindByIdAsync(staff.UserId);
+                    if (user != null)
+                    {
+                        if (await _userManager.IsInRoleAsync(user, "Customer"))
+                        {
+                            await _userManager.RemoveFromRoleAsync(user, "Customer");
+                        }
+                        if (!await _userManager.IsInRoleAsync(user, "Staff"))
+                        {
+                            await _userManager.AddToRoleAsync(user, "Staff");
+                        }
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -198,6 +229,20 @@ namespace AppointmentsManagementSystem.Controllers
             var staff = await _context.Staff.FindAsync(id);
             if (staff != null)
             {
+                // رجّعي الحساب Customer تاني بعد ما اتشال من Staff
+                var user = await _userManager.FindByIdAsync(staff.UserId);
+                if (user != null)
+                {
+                    if (await _userManager.IsInRoleAsync(user, "Staff"))
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, "Staff");
+                    }
+                    if (!await _userManager.IsInRoleAsync(user, "Customer"))
+                    {
+                        await _userManager.AddToRoleAsync(user, "Customer");
+                    }
+                }
+
                 _context.Staff.Remove(staff);
             }
 

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<AppointmentsManagementSystem.Models.Appointment>
+@{
+    ViewData["Title"] = "My Schedule";
+    var staff = (AppointmentsManagementSystem.Models.Staff)ViewBag.StaffProfile;
+}
+
+<div class="page-header">
+    <div>
+        <h1>My schedule</h1>
+        <p>Your upcoming and past appointments, @staff.Specialization.</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="admin-card">
+        <div class="empty-state">
+            <h3>No appointments yet</h3>
+            <p>Bookings assigned to you will show up here.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Date &amp; time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Customer?.FullName</td>
+                        <td>@item.Service?.Name</td>
+                        <td>@item.AppointmentDate.ToString("MMM d, yyyy") &middot; @item.StartTime.ToString(@"hh\:mm")</td>
+                        <td><span class="badge-status status-@item.Status.ToString().ToLower()">@item.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
