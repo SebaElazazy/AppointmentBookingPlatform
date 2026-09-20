@@ -72,16 +72,38 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-controller="Services" asp-action="Index">Services</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-controller="Staff" asp-action="Index">Staff</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-controller="WorkingHour" asp-action="Index">Working Hours</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-controller="AvailabilityException" asp-action="Index">Exceptions</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">Appointments</a></li>
-                    </ul>
+                   <ul class="navbar-nav flex-grow-1">
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+    </li>
+
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        </li>
+    }
+
+    @if (!User.Identity.IsAuthenticated || User.IsInRole("Customer"))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Services" asp-action="Index">Services</a>
+        </li>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">My Appointments</a>
+            </li>
+        }
+    }
+
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Staff"))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="StaffPortal" asp-action="MySchedule">My Schedule</a>
+        </li>
+    }
+</ul>
                     <partial name="_LoginPartial" />
                 </div>
             </div>
