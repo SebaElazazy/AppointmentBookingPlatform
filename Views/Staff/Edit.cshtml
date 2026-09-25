@@ -1,5 +1,6 @@
 @model AppointmentsManagementSystem.Models.Staff
 @{
+      Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_Layout";
     ViewData["Title"] = "Edit staff";
     var services = (List<AppointmentsManagementSystem.Models.Service>)ViewBag.Services;
     var selected = (List<int>)ViewBag.SelectedServices;

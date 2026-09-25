@@ -1,0 +1,134 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using AppointmentsManagementSystem.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Appointo Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body { margin-bottom: 0; }
+        .admin-shell { display: flex; min-height: 100vh; }
+        .admin-side {
+            width: 232px; flex-shrink: 0; background: var(--navy-deep);
+            padding: 24px 16px; color: #D7E1F5; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+        }
+        .admin-side .logo {
+            font-family: 'Fraunces', serif; font-weight: 600; font-size: 21px; color: #fff;
+            display: flex; align-items: center; gap: 10px; padding: 0 8px 26px;
+        }
+        .admin-side .logo .mark {
+            width: 30px; height: 30px; border-radius: 9px; background: var(--primary);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .a-link {
+            display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 10px;
+            font-size: 14px; font-weight: 500; margin-bottom: 2px; color: #B9C6E0;
+        }
+        .a-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+        .a-link.active { background: rgba(255,255,255,.1); color: #fff; font-weight: 700; }
+        .a-link svg { width: 17px; height: 17px; opacity: .85; flex-shrink: 0; }
+        .admin-main { flex: 1; background: var(--paper); min-width: 0; }
+        .admin-topbar {
+            background: #fff; border-bottom: 1px solid var(--line); padding: 16px 34px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .admin-topbar .crumb { font-weight: 700; font-size: 15px; color: var(--primary-deep); }
+        .admin-topbar .who { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--ink-soft); }
+        .admin-topbar .avatar {
+            width: 34px; height: 34px; border-radius: 50%; background: var(--primary-deep); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 13px;
+        }
+        .admin-body-wrap { padding: 30px 34px; }
+        @@media (max-width:900px) {
+            .admin-side { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-shell">
+        <div class="admin-side">
+            <div class="logo">
+                <span class="mark">
+                    <svg viewBox="0 0 24 24" fill="none" style="width:16px;height:16px;"><path d="M4 10h16M8 4v4M16 4v4M6 8h12a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a2 2 0 012-2z" stroke="white" stroke-width="1.8" stroke-linecap="round" /></svg>
+                </span>
+                Appointo
+            </div>
+
+            <a class="a-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")" asp-controller="Dashboard" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" /><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" /><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" /><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" /></svg>
+                Dashboard
+            </a>
+            <a class="a-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Services" ? "active" : "")" asp-controller="Services" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.6H20l-4.6 3.4 1.8 5.6L12 14.2 6.8 17.6l1.8-5.6L4 8.6h6.2z" stroke="currentColor" stroke-width="1.5" /></svg>
+                Services
+            </a>
+            <a class="a-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Staff" ? "active" : "")" asp-controller="Staff" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6" /><path d="M5 20c1.2-4 4-5.6 7-5.6s5.8 1.6 7 5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+                Staff
+            </a>
+            <a class="a-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "WorkingHour" ? "active" : "")" asp-controller="WorkingHour" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6" /><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+                Working hours
+            </a>
+            <a class="a-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "AvailabilityException" ? "active" : "")" asp-controller="AvailabilityException" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="16" rx="2" stroke="currentColor" stroke-width="1.6" /><path d="M3.5 9.5h17M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+                Exceptions
+            </a>
+            <a class="a-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Appointment" ? "active" : "")" asp-controller="Appointment" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="16" rx="2" stroke="currentColor" stroke-width="1.6" /><path d="M3.5 9.5h17M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+                Appointments
+            </a>
+
+            <div style="margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,.1);">
+                <a class="a-link" asp-controller="Home" asp-action="Index">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7M6 10v9a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    View site
+                </a>
+                <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" style="margin:0;">
+                    <button type="submit" class="a-link" style="width:100%; text-align:left; background:none; border:none; color:#E3A6A6;">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M15 17l5-5-5-5M20 12H9M12 19H6a2 2 0 01-2-2V7a2 2 0 012-2h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        Log out
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="admin-main">
+            <div class="admin-topbar">
+                <div class="crumb">@ViewData["Title"]</div>
+                <div class="who">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <span>@User.Identity!.Name</span>
+                        <div class="avatar">@(User.Identity!.Name != null && User.Identity.Name.Length > 0 ? User.Identity.Name.Substring(0,1).ToUpper() : "A")</div>
+                    }
+                </div>
+            </div>
+
+            <div class="admin-body-wrap">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

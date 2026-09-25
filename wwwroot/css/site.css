@@ -19,7 +19,6 @@ html {
 
 body {
     margin-bottom: 60px;
-    height:100%
 }
 
 /* =========================================================
@@ -647,9 +646,4 @@ footer.footer {
             border-bottom: 1px solid var(--line);
             padding: 10px 0;
         }
-}
-
-.container.flex-grow-1 {
-    padding-top: 1.5rem !important;
-    padding-bottom: 2rem !important;
 }
