@@ -45,7 +45,15 @@ namespace AppointmentsManagementSystem.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization");
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText");
             return View();
         }
 
@@ -61,7 +69,16 @@ namespace AppointmentsManagementSystem.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", exception.StaffId);
+
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText", exception.StaffId);
             return View(exception);
         }
 
@@ -74,7 +91,15 @@ namespace AppointmentsManagementSystem.Controllers
             var exception = await _context.AvailabilityExceptions.FindAsync(id);
             if (exception == null) return NotFound();
 
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", exception.StaffId);
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText", exception.StaffId);
             return View(exception);
         }
 
@@ -100,7 +125,16 @@ namespace AppointmentsManagementSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", exception.StaffId);
+
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText", exception.StaffId);
             return View(exception);
         }
 

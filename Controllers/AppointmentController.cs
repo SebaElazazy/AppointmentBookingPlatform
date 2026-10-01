@@ -13,7 +13,7 @@ namespace AppointmentsManagementSystem.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AppointmentController(ApplicationDbContext context, UserManager <ApplicationUser> userManager)
+        public AppointmentController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -29,7 +29,6 @@ namespace AppointmentsManagementSystem.Controllers
                 .Include(a => a.Service)
                 .AsQueryable();
 
-            
             if (!User.IsInRole("Admin"))
             {
                 var userId = _userManager.GetUserId(User);
@@ -61,8 +60,16 @@ namespace AppointmentsManagementSystem.Controllers
         [Authorize]
         public IActionResult Create()
         {
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
             ViewData["CustomerId"] = new SelectList(_context.Users, "Id", "FullName");
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization");
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText");
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name");
             return View();
         }
@@ -95,7 +102,6 @@ namespace AppointmentsManagementSystem.Controllers
             }
             else
             {
-                
                 var workingHour = await _context.WorkingHours
                     .FirstOrDefaultAsync(w => w.StaffId == appointment.StaffId
                         && w.DayOfWeek == appointment.AppointmentDate.DayOfWeek);
@@ -140,11 +146,20 @@ namespace AppointmentsManagementSystem.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
             ViewData["CustomerId"] = new SelectList(_context.Users, "Id", "FullName", appointment.CustomerId);
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", appointment.StaffId);
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText", appointment.StaffId);
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", appointment.ServiceId);
             return View(appointment);
         }
+
         // GET: Appointment/Edit/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
@@ -154,8 +169,16 @@ namespace AppointmentsManagementSystem.Controllers
             var appointment = await _context.Appointments.FindAsync(id);
             if (appointment == null) return NotFound();
 
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
             ViewData["CustomerId"] = new SelectList(_context.Users, "Id", "FullName", appointment.CustomerId);
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", appointment.StaffId);
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText", appointment.StaffId);
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", appointment.ServiceId);
             return View(appointment);
         }
@@ -168,7 +191,6 @@ namespace AppointmentsManagementSystem.Controllers
         {
             if (id != appointment.Id) return NotFound();
 
-           
             bool hasConflict = await _context.Appointments
                 .AnyAsync(a => a.Id != appointment.Id
                     && a.StaffId == appointment.StaffId
@@ -197,8 +219,16 @@ namespace AppointmentsManagementSystem.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var staffList = _context.Staff
+                .Include(s => s.User)
+                .Select(s => new {
+                    Id = s.Id,
+                    DisplayText = s.User != null ? $"{s.User.FullName} ({s.Specialization})" : s.Specialization
+                })
+                .ToList();
+
             ViewData["CustomerId"] = new SelectList(_context.Users, "Id", "FullName", appointment.CustomerId);
-            ViewData["StaffId"] = new SelectList(_context.Staff, "Id", "Specialization", appointment.StaffId);
+            ViewData["StaffId"] = new SelectList(staffList, "Id", "DisplayText", appointment.StaffId);
             ViewData["ServiceId"] = new SelectList(_context.Services, "Id", "Name", appointment.ServiceId);
             return View(appointment);
         }

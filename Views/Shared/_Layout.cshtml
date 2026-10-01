@@ -1,6 +1,4 @@
-﻿
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -72,45 +70,49 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                   <ul class="navbar-nav flex-grow-1">
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
-    </li>
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
 
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
-        </li>
-    }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            </li>
+                        }
 
-    @if (!User.Identity.IsAuthenticated || User.IsInRole("Customer"))
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Services" asp-action="Index">Services</a>
-        </li>
-        @if (User.Identity.IsAuthenticated)
-        {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">My Appointments</a>
-            </li>
-        }
-    }
+                        @if (!User.Identity.IsAuthenticated || User.IsInRole("Customer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Services" asp-action="Index">Services</a>
+                            </li>
+                            <!-- زرار الستاف المضاف حديثاً -->
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Staff" asp-action="Index">Staff</a>
+                            </li>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">My Appointments</a>
+                                </li>
+                            }
+                        }
 
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Staff"))
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="StaffPortal" asp-action="MySchedule">My Schedule</a>
-        </li>
-    }
-</ul>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Staff"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="StaffPortal" asp-action="MySchedule">My Schedule</a>
+                            </li>
+                        }
+                    </ul>
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="main-content container py-4">
+    <div class="main-content">
         <main role="main">
             @RenderBody()
         </main>
@@ -141,25 +143,24 @@
                     </div>
                 </div>
 
-                <!-- العمود الثاني -->
                 <div class="col-lg-3 col-md-6">
                     <h5>Quick Links</h5>
                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
                         <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li><a asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
                         <li><a asp-controller="Services" asp-action="Index">Services</a></li>
+                        <li><a asp-controller="Staff" asp-action="Index">Staff</a></li>
                         <li><a asp-controller="Appointment" asp-action="Index">Appointments</a></li>
-                        <li><a asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                       
                     </ul>
                 </div>
 
-                <!-- العمود الثالث -->
+             
                 <div class="col-lg-4 col-md-12">
                     <h5>Contact Us</h5>
                     <ul class="list-unstyled d-flex flex-column gap-3 mb-0 text-secondary small">
                         <li class="d-flex align-items-start gap-2">
                             <span class="text-white">📍</span>
-                            <span>123 Business Avenue, Tech District, Arish, Egypt</span>
+                            <span>123 Business Avenue, Tech District,Ismalia, Egypt</span>
                         </li>
                         <li class="d-flex align-items-center gap-2">
                             <span class="text-white">📞</span>
