@@ -1,8 +1,156 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<AppointmentsManagementSystem.Models.Service>
+@{
+    ViewData["Title"] = "Appointo — Book appointments effortlessly";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<section style="background: linear-gradient(135deg, var(--primary-deep), #1e3a6e); color:#fff; padding: 72px 24px; width: 100%; margin: 0;">
+    <div style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center; max-width: 1200px; margin: 0 auto;">
+        <div>
+            <span class="hero-badge" style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.12); padding:6px 14px; border-radius:999px; font-size:.82rem; font-weight:500; margin-bottom:18px;">
+                Trusted by @ViewBag.TotalStaff staff members
+            </span>
+            <h1 style="color:#fff; font-size:2.6rem; line-height:1.25; margin-bottom:16px;">
+                Every open slot, filled without a single phone call.
+            </h1>
+            <p class="lead" style="color:rgba(255,255,255,.78); font-size:1.05rem; max-width:48ch; margin-bottom:28px;">
+                Appointo gives your business one place to publish availability, take bookings, and stop double-booking staff — automatically.
+            </p>
+            <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:36px;">
+                <a asp-controller="Services" asp-action="Index" class="btn" style="background:#fff; color:var(--primary-deep); padding:12px 26px; border-radius:8px; font-weight:600;">Find an appointment</a>
+                <a href="#how-it-works" class="btn" style="border:1px solid rgba(255,255,255,.35); color:#fff; padding:12px 26px; border-radius:8px; font-weight:500;">See how it works</a>
+            </div>
+            <div style="display:flex; gap:36px; flex-wrap:wrap;">
+                <div><b style="display:block; font-size:1.5rem; font-weight:700;">@ViewBag.TotalServices</b><span style="font-size:.85rem; color:rgba(255,255,255,.65);">services offered</span></div>
+                <div><b style="display:block; font-size:1.5rem; font-weight:700;">@ViewBag.TotalStaff</b><span style="font-size:.85rem; color:rgba(255,255,255,.65);">staff ready to help</span></div>
+                <div><b style="display:block; font-size:1.5rem; font-weight:700;">@ViewBag.TotalBookings</b><span style="font-size:.85rem; color:rgba(255,255,255,.65);">appointments booked</span></div>
+            </div>
+        </div>
+
+        <div style="background:#fff; color:var(--ink); border-radius:14px; padding:24px; box-shadow:0 20px 40px -12px rgba(15,42,86,.35);">
+            <h3 style="font-size:.95rem; color:var(--ink-soft); font-weight:600; margin-bottom:16px;">Book in three steps</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin-bottom:10px;">
+                <div><div style="font-size:.9rem; font-weight:600;">1. Choose a service</div><div style="font-size:.78rem; color:var(--ink-soft);">Priced and timed up front</div></div>
+                <span style="background:rgba(29,78,216,.1); color:var(--primary); font-size:.8rem; font-weight:700; padding:5px 12px; border-radius:999px;">Step 1</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin-bottom:10px;">
+                <div><div style="font-size:.9rem; font-weight:600;">2. Pick your staff member</div><div style="font-size:.78rem; color:var(--ink-soft);">See who's actually free</div></div>
+                <span style="background:rgba(29,78,216,.1); color:var(--primary); font-size:.8rem; font-weight:700; padding:5px 12px; border-radius:999px;">Step 2</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border:1px solid var(--line); border-radius:10px; padding:12px 16px;">
+                <div><div style="font-size:.9rem; font-weight:600;">3. Confirm the slot</div><div style="font-size:.78rem; color:var(--ink-soft);">Conflicts blocked automatically</div></div>
+                <span style="background:rgba(29,78,216,.1); color:var(--primary); font-size:.8rem; font-weight:700; padding:5px 12px; border-radius:999px;">Step 3</span>
+            </div>
+            <a asp-controller="Appointment" asp-action="Create" class="btn btn-primary" style="display:block; text-align:center; width:100%; margin-top:16px;">Book now</a>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <section class="appointo-section" style="padding-top: 20px;">
+        <div class="section-inner">
+         
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--ink); margin-bottom: 10px;">Our services</h2>
+                <p style="color: var(--ink-soft); font-size: 1.05rem; margin-bottom: 20px;">Whatever you offer, it books the same way.</p>
+                <a asp-controller="Services" asp-action="Index" class="btn btn-outline-primary" style="border-radius: 999px; padding: 8px 24px; font-weight: 600; font-size: 0.9rem;">
+                    View all services &rarr;
+                </a>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="admin-card">
+                    <div class="empty-state">
+                        <h3>No services published yet</h3>
+                        <p>Check back soon.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+        
+                <div class="service-card-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+                    @foreach (var service in Model.Take(3))
+                    {
+                        <div class="service-card creative-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div class="card-img-wrapper" style="position: relative;">
+                                    <img src="@(!string.IsNullOrEmpty(service.ImageUrl) ? service.ImageUrl : "/images/default-service.jpg")" alt="@service.Name" class="service-img" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;" />
+                                    <span class="tag duration-tag" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">@service.DurationMinutes min</span>
+                                </div>
+
+                                <div class="card-content" style="padding: 16px 0;">
+                                    <h3 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 8px;">@service.Name</h3>
+                                    <p style="color: var(--ink-soft); font-size: 0.9rem; line-height: 1.4;">@service.Description</p>
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer-custom" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; margin-top: auto;">
+                                <span class="price" style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">@service.Price.ToString("0") EGP</span>
+                                <a asp-controller="Appointment" asp-action="Create" asp-route-serviceId="@service.Id" class="book-btn btn btn-sm btn-primary" style="padding: 6px 16px; border-radius: 6px;">Book now</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+<section class="appointo-section" id="how-it-works" style="padding: 60px 0; background: #f8fafc; border-top: 1px solid var(--line, #e2e8f0); border-bottom: 1px solid var(--line, #e2e8f0); margin: 40px 0;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+       
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h2 style="font-size: 2.2rem; font-weight: 700; color: var(--ink, #0f172a); margin-bottom: 10px;">How it works</h2>
+            <p style="color: var(--ink-soft, #64748b); font-size: 1.05rem;">Three steps, no back-and-forth.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+            
+       
+            <div class="service-card creative-card" style="background: #ffffff; border: 1px solid var(--line, #e2e8f0); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                        <span style="background: rgba(29, 78, 216, 0.1); color: var(--primary, #1d4ed8); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 700; font-size: 1.2rem;">01</span>
+                        <span style="font-size: 1.5rem;">🔍</span>
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ink, #0f172a); margin-bottom: 10px;">Pick a service</h3>
+                    <p style="color: var(--ink-soft, #64748b); font-size: 0.92rem; line-height: 1.5;">Browse what's on offer, priced and timed up front — no calling to ask.</p>
+                </div>
+            </div>
+
+     
+            <div class="service-card creative-card" style="background: #ffffff; border: 1px solid var(--line, #e2e8f0); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                        <span style="background: rgba(29, 78, 216, 0.1); color: var(--primary, #1d4ed8); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 700; font-size: 1.2rem;">02</span>
+                        <span style="font-size: 1.5rem;">👤</span>
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ink, #0f172a); margin-bottom: 10px;">Choose your person</h3>
+                    <p style="color: var(--ink-soft, #64748b); font-size: 0.92rem; line-height: 1.5;">See who provides it and when they're actually free this week.</p>
+                </div>
+            </div>
+
+     
+            <div class="service-card creative-card" style="background: #ffffff; border: 1px solid var(--line, #e2e8f0); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                        <span style="background: rgba(29, 78, 216, 0.1); color: var(--primary, #1d4ed8); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 700; font-size: 1.2rem;">03</span>
+                        <span style="font-size: 1.5rem;">✨</span>
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ink, #0f172a); margin-bottom: 10px;">Confirm the slot</h3>
+                    <p style="color: var(--ink-soft, #64748b); font-size: 0.92rem; line-height: 1.5;">The system checks for conflicts before it lets the booking through.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+    <section class="appointo-section" style="padding-top:20px; padding-bottom:40px; text-align:center;">
+        <div class="section-inner">
+            <h2 style="margin-bottom:12px;">Ready to book?</h2>
+            <p style="color:var(--ink-soft); margin-bottom:24px;">Join 100 people who've already booked through Appointo.</p>
+            <a asp-controller="Services" asp-action="Index" class="action-btn" style="font-size:1rem; padding:12px 28px;">Browse services</a>
+        </div>
+    </section>
 </div>

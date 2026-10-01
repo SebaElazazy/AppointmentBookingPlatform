@@ -1,13 +1,12 @@
 @model IEnumerable<AppointmentsManagementSystem.Models.Staff>
 @{
-      Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_Layout";
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_Layout";
     ViewData["Title"] = "Staff";
 }
-
-<div class="page-header">
+<div class="page-header" style="text-align: center !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;">
     <div>
-        <h1>Staff</h1>
-        <p>The people who provide your services.</p>
+        <h1 style="margin-bottom: 5px;">Staff</h1>
+        <p style="margin-bottom: 15px;">The people who provide your services.</p>
     </div>
     @if (User.IsInRole("Admin"))
     {
@@ -33,50 +32,48 @@
 }
 else
 {
-    <div class="admin-card">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Specialization</th>
-                    <th>Email</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            <div class="cell-primary">
-                                @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                {
-                                    <img src="@item.ImageUrl" class="row-thumb" style="border-radius:50%;" alt="@item.User?.FullName" />
-                                }
-                                else
-                                {
-                                    <div class="avatar-chip">@(item.User?.FullName?.Substring(0, 1) ?? "?")</div>
-                                }
-                                <div class="t">
-                                    <strong>@item.User?.FullName</strong>
-                                </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; margin: 24px 0;">
+        @foreach (var item in Model)
+        {
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s;">
+                
+                <div>
+                 
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #f1f5f9;" alt="@item.User?.FullName" />
+                        }
+                        else
+                        {
+                            <div style="width: 50px; height: 50px; border-radius: 50%; background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem;">
+                                @(item.User?.FullName?.Substring(0, 1) ?? "?")
                             </div>
-                        </td>
-                        <td>@item.Specialization</td>
-                        <td>@item.User?.Email</td>
-                        <td>
-                            <div class="action-links">
-                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="danger">Delete</a>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        }
+                        <div>
+                            <h3 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 600; color: #1e293b;">@item.User?.FullName</h3>
+                            <span style="font-size: 0.8rem; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; display: inline-block;">@item.Specialization</span>
+                        </div>
+                    </div>
+
+                    <!-- البريد الإلكتروني -->
+                    <div style="font-size: 0.85rem; color: #475569; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; word-break: break-all;">
+                        <svg style="width: 14px; height: 14px; color: #64748b; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <span>@item.User?.Email</span>
+                    </div>
+                </div>
+
+                <!-- الأزرار -->
+                <div style="border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                    <a asp-action="Details" asp-route-id="@item.Id" style="padding: 6px 12px; font-size: 0.8rem; background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-weight: 500;">Details</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" style="padding: 6px 12px; font-size: 0.8rem; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 6px; text-decoration: none; font-weight: 500;">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" style="padding: 6px 12px; font-size: 0.8rem; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 6px; text-decoration: none; font-weight: 500;">Delete</a>
+                    }
+                </div>
+
+            </div>
+        }
     </div>
 }
